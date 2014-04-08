@@ -10,7 +10,9 @@ Requirements:
 Usage:
 ------
 
-``yum install dnf libvirt-client``
+Install requirements::
+
+        yum install dnf libvirt-client
 
 as root run::
 
