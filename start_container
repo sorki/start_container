@@ -1,0 +1,54 @@
+#!/bin/bash
+
+RELEASE="20"
+ROOTPW="lxc"
+
+PACKAGES="systemd passwd yum fedora-release vim-minimal openssh-server procps-ng dhclient which"
+ROOTFS="/var/lib/libvirt/filesystems/$NAME"
+
+die() {
+    echo "Unable to proceed"
+    exit 1
+}
+
+if [[ $# != 1 ]]; then
+    echo "Usage: start_container NAME"
+    die
+fi
+
+NAME="$1"
+
+# create filesystem populated with minimal set of packages
+dnf -y --releasever=$RELEASE \
+    --nogpg \
+    --installroot=$ROOTFS \
+    install $PACKAGES || die
+
+# enable pts0, set root password and enable networking
+chroot $ROOTFS /bin/bash -x <<IN_CHROOT
+
+echo "pts/0" > /etc/securetty
+echo "$ROOTPW" | passwd --stdin root
+cp -a /etc/skel/. /root/.
+echo "$NAME" > /etc/hostname
+
+cat > /etc/sysconfig/network << END
+NETWORKING=yes
+END
+
+cat > /etc/sysconfig/network-scripts/ifcfg-eth0 << END
+DEVICE=eth0
+ONBOOT=yes
+BOOTPROTO=dhcp
+END
+
+chkconfig network on
+
+IN_CHROOT
+
+# add to libvirt & start
+virt-install --connect lxc:/// \
+    --name $NAME \
+    --ram 800 \
+    --filesystem $ROOTFS,/ \
+    --noautoconsole

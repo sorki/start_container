@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if [[ $# != 1 ]]; then
+    echo "Usage: start_container NAME"
+    die
+fi
+
+NAME="$1"
+
+if virsh --connect lxc:/// list | grep -q "${NAME}";  then
+    echo 'Destroying virtual machine'
+    virsh --connect lxc:/// destroy "${NAME}"
+fi
+
+if virsh --connect lxc:/// list --all | grep -q "${NAME}";  then
+    echo 'Undef virtual machine'
+    virsh --connect lxc:/// undefine "${NAME}"
+fi
