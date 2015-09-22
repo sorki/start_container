@@ -1,10 +1,9 @@
 #!/bin/bash
 
-RELEASE="20"
+RELEASE="23"
 ROOTPW="lxc"
 
 PACKAGES="systemd passwd yum fedora-release vim-minimal openssh-server procps-ng dhclient which"
-ROOTFS="/var/lib/libvirt/filesystems/$NAME"
 
 die() {
     echo "Unable to proceed"
@@ -17,6 +16,7 @@ if [[ $# != 1 ]]; then
 fi
 
 NAME="$1"
+ROOTFS="/var/lib/libvirt/filesystems/$NAME"
 
 # create filesystem populated with minimal set of packages
 dnf -y --releasever=$RELEASE \

@@ -12,7 +12,7 @@ Usage:
 
 Install requirements::
 
-        yum install dnf libvirt-client
+        yum install dnf libvirt-client libvirt-daemon*lxc
 
 as root run::
 
